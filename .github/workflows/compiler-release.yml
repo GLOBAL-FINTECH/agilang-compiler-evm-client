@@ -1,0 +1,25 @@
+name: Compiler integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.4'
+          cache: pip
+      - run: pip install -r compiler_distribution/requirements.txt pytest
+      - run: python compiler_distribution/verify_install.py
+      - run: python compiler_distribution/build_release.py
+      - run: pytest -q tests
+      - run: docker build -f compiler_distribution/Dockerfile -t agilang-native-evm:0.5.0 .
