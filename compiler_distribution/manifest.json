@@ -1,0 +1,19 @@
+{
+  "schema": "agilang.compiler-manifest/v1",
+  "compilerVersion": "AGILANG-NATIVE-EVM/0.5.0",
+  "gatewayVersion": "0.9.0",
+  "language": "AGILANG",
+  "target": "EVM",
+  "evmVersion": "shanghai",
+  "reproducible": true,
+  "files": [
+    {"path": "vendor/agilang/agilang_contract_compiler.py", "sha256": "2a99ee65ee9a12547aced3fa9464039bd4addf49f11d5be4dd4c364be6784035", "bytes": 29259},
+    {"path": "vendor/agilang/agilang_secure_contract_compiler.py", "sha256": "c78478c6528f31568f641d71398bc328cc270f2fe4b25cc19385049686d5310b", "bytes": 72657},
+    {"path": "vendor/agilang/agilang_advanced_contract_compiler.py", "sha256": "a7f9006a80e24347d8ceb571390c2be7a3a82969203affbe0a1f4487434e1f55", "bytes": 59896},
+    {"path": "vendor/agilang/evm.py", "sha256": "d05274d7a457e46bfe3993058fd46e8554223be83cd77747af067eccdd294da1", "bytes": 49494},
+    {"path": "vendor/agilang/native_execution_client.py", "sha256": "aaa495417b4a42d4a94fa57a625b2d4d1c0281b279fb144e475a7ad2c15577c0", "bytes": 37674},
+    {"path": "vendor/agilang/__init__.py", "sha256": "0981d15c975a0318f4fd0212caf6c49584cb3880a2ebf86f77a19f34038f0dab", "bytes": 5879},
+    {"path": "vendor/agilang/ethereum_forks.py", "sha256": "644282650e077429c6abe010b4544e08e9e21d7e4261d40f26259d25b6e45465", "bytes": 1204},
+    {"path": "vendor/agilang/ethereum_trie.py", "sha256": "68aebce714702fc3083ab8bec4ee262b81cf5d85296f52dca9f06b518deb92e0", "bytes": 5938}
+  ]
+}
