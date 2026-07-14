@@ -14,18 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Initialize diagnostics
+        run: |
+          : > compiler-ci-diagnostics.log
+          echo "runner initialized" >> compiler-ci-diagnostics.log
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.4'
-          cache: pip
-      - run: pip install -r compiler_distribution/requirements.txt pytest
 
       - name: Run compiler security checks
         id: checks
         shell: bash
         run: |
           set +e
-          : > compiler-ci-diagnostics.log
           status=0
 
           run_check() {
@@ -37,6 +40,7 @@ jobs:
               "$@"
               code=$?
               echo "===== ${name}: exit ${code} ====="
+              exit "$code"
             } 2>&1 | tee -a compiler-ci-diagnostics.log
             code=${PIPESTATUS[0]}
             if [ "$code" -ne 0 ]; then
@@ -44,9 +48,11 @@ jobs:
             fi
           }
 
+          run_check "python version" python --version
+          run_check "dependency installation" python -m pip install -r compiler_distribution/requirements.txt pytest
           run_check "manifest integrity" python compiler_distribution/verify_install.py
           run_check "deterministic release" python compiler_distribution/build_release.py
-          run_check "pytest" pytest -q tests
+          run_check "pytest" python -m pytest -q tests
           run_check "docker build" docker build -f compiler_distribution/Dockerfile -t agilang-native-evm:0.5.0 .
 
           echo "status=${status}" >> "$GITHUB_OUTPUT"
