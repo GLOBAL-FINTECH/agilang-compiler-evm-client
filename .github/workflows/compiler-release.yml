@@ -14,12 +14,61 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Initialize diagnostics
+        run: |
+          : > compiler-ci-diagnostics.log
+          echo "runner initialized" >> compiler-ci-diagnostics.log
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.4'
-          cache: pip
-      - run: pip install -r compiler_distribution/requirements.txt pytest
-      - run: python compiler_distribution/verify_install.py
-      - run: python compiler_distribution/build_release.py
-      - run: pytest -q tests
-      - run: docker build -f compiler_distribution/Dockerfile -t agilang-native-evm:0.5.0 .
+
+      - name: Run compiler security checks
+        id: checks
+        shell: bash
+        run: |
+          set +e
+          status=0
+
+          run_check() {
+            name="$1"
+            shift
+            {
+              echo ""
+              echo "===== ${name} ====="
+              "$@"
+              code=$?
+              echo "===== ${name}: exit ${code} ====="
+              exit "$code"
+            } 2>&1 | tee -a compiler-ci-diagnostics.log
+            code=${PIPESTATUS[0]}
+            if [ "$code" -ne 0 ]; then
+              status=1
+            fi
+          }
+
+          run_check "python version" python --version
+          run_check "dependency installation" python -m pip install -r compiler_distribution/requirements.txt pytest
+          run_check "manifest integrity" python compiler_distribution/verify_install.py
+          run_check "deterministic release" python compiler_distribution/build_release.py
+          run_check "pytest" python -m pytest -q tests
+          run_check "docker build" docker build -f compiler_distribution/Dockerfile -t agilang-native-evm:0.5.0 .
+
+          echo "status=${status}" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload compiler diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiler-ci-diagnostics
+          path: compiler-ci-diagnostics.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce compiler security checks
+        if: steps.checks.outputs.status != '0'
+        run: |
+          cat compiler-ci-diagnostics.log
+          exit 1
