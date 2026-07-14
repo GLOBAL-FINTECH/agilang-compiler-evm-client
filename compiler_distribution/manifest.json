@@ -34,8 +34,8 @@
     },
     {
       "path": "vendor/agilang/__init__.py",
-      "sha256": "0981d15c975a0318f4fd0212caf6c49584cb3880a2ebf86f77a19f34038f0dab",
-      "bytes": 5879
+      "sha256": "778419475ebe1fd5c62778abc4c30a33c06e4906de4535787c25adc94d3a488c",
+      "bytes": 2185
     },
     {
       "path": "vendor/agilang/ethereum_forks.py",
